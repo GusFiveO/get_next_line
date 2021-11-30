@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/30 12:49:31 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/30 16:44:00 by alorain          ###   ########.fr       */
+/*   Created: 2021/11/30 18:40:51 by alorain           #+#    #+#             */
+/*   Updated: 2021/11/30 19:38:16 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-#include <stdio.h>
+#include "get_next_line_bonus.h"
 
 static size_t	sub_len(char *s, unsigned int start, size_t len)
 {
@@ -106,16 +105,22 @@ char	*read_file(int fd, char **excess)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*excess = NULL;
+	static char	*excess[_SC_OPEN_MAX];
+	char		*buffer;
 
-	if (fd == -1 || BUFFER_SIZE <= 0)
+	buffer = malloc(sizeof(char));
+	if (fd == -1 || BUFFER_SIZE <= 0 || read(fd, buffer, 0))
+	{	
+		free(buffer);
 		return (NULL);
-	if (!excess)
-	{
-		excess = malloc(sizeof(char));
-		excess[0] = '\0';
 	}
-	line = read_file(fd, &excess);
+	free(buffer);
+	if (!excess[fd])
+	{
+		excess[fd] = malloc(sizeof(char));
+		excess[fd][0] = '\0';
+	}
+	line = read_file(fd, &excess[fd]);
 	if (!line)
 	{
 		free(line);
