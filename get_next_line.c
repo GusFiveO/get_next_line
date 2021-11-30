@@ -6,7 +6,7 @@
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 12:49:31 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/30 12:49:33 by alorain          ###   ########.fr       */
+/*   Updated: 2021/11/30 12:55:47 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,25 +128,3 @@ char	*get_next_line(int fd)
 	}
 	return (line);
 }
-
-/* int main()
-{
-	int	fd;
-
-	fd = open("./test_get_next_line.txt", O_RDONLY);
-	if (fd < 0)
-		return(0);
-	for (int i = 0; i < 5; i++)
-	{
-		char *str = get_next_line(1000);
-		if (!str)
-		{
-			printf("file error or empty file");
-			return (0);
-		}	
-		printf("%s", str);
-		free(str);
-	}
-	close(fd);
-	return (0);	
-} */
