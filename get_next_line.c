@@ -5,90 +5,55 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/29 19:23:22 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/29 22:23:24 by alorain          ###   ########.fr       */
+/*   Created: 2021/11/30 12:49:31 by alorain           #+#    #+#             */
+/*   Updated: 2021/11/30 12:49:33 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-char    *ft_strjoin(char *s1, char *s2)
+static size_t	sub_len(char *s, unsigned int start, size_t len)
 {
-        size_t  len;
-        size_t  i;
-        size_t  j;
-        char    *str;
+	size_t	i;
 
-        if (!s1)
-                return (NULL);
-        len = ft_strlen(s1) + ft_strlen(s2);
-        i = 0;
-        j = 0;
-        str = malloc(sizeof(char) * (len + 1));
-        if (!str)
-                return (NULL);
-        while (s1[i])
-        {
-                str[i] = s1[i];
-                i++;
-        }
-        while (s2[j])
-        {
-                str[j + i] = s2[j];
-                j++;
-        }
-        str[i + j] = '\0';
-        return (str);
+	i = 0;
+	while (s[start + i])
+		i++;
+	if (i < len)
+		return (i);
+	return (len);
 }
 
-static size_t   sub_len(char *s, unsigned int start, size_t len)
+char	*ft_substr(char *s, unsigned int start, size_t len)
 {
-        size_t  i;
+	size_t	i;
+	char	*str;
 
-        i = 0;
-        while (s[start + i])
-                i++;
-        if (i < len)
-                return (i);
-        return (len);
+	if (!s)
+		return (NULL);
+	i = 0;
+	if (start >= ft_strlen(s))
+	{
+		str = malloc(sizeof(char));
+		if (!str)
+			return (NULL);
+		str[0] = '\0';
+		return (str);
+	}
+	str = malloc(sizeof(char) * (sub_len(s, start, len) + 1));
+	if (!str)
+		return (NULL);
+	while (i < len && s[start + i])
+	{
+		str[i] = s[start + i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
 }
 
-char    *ft_substr(char *s, unsigned int start, size_t len)
-{
-        size_t  i;
-        char    *str;
-
-        if (!s)
-                return (NULL);
-        i = 0;
-        if (start >= ft_strlen(s))
-        {
-                str = malloc(sizeof(char) * 1);
-                if (!str)
-                        return (NULL);
-                str[0] = '\0';
-                return (str);
-        }
-        str = malloc(sizeof(char) * (sub_len(s, start, len) + 1));
-        if (!str)
-                return (NULL);
-        while (i < len && s[start + i])
-        {
-                str[i] = s[start + i];
-                i++;
-        }
-        str[i] = '\0';
-        return (str);
-}
-
-void	ft_free(char **str)
-{
-	free(*str);
-	*str = NULL;
-}
-
-char	*parse(char	**excess)
+char	*parse(char **excess)
 {
 	char	*line;
 	char	*temp;
@@ -109,42 +74,58 @@ char	*parse(char	**excess)
 	return (line);
 }
 
-char	*read_file(int fd)
+char	*read_file(int fd, char **excess)
 {
 	ssize_t		bytes_read;
 	char		*buffer;
 	char		*line;
 	char		*temp;
-	static char	*excess = NULL;
 
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!excess)
+	if (!buffer)
+		return (NULL);
+	bytes_read = BUFFER_SIZE;
+	while (bytes_read && !ft_isin(*excess, '\n'))
 	{
-		excess = malloc(sizeof(char));
-		excess[0] = '\0';
-	}
-	bytes_read = BUFFER_SIZE;	
-	while(bytes_read && !ft_isin(excess, '\n'))
-	{
-		bytes_read = read(fd, buffer,BUFFER_SIZE);
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read < 0)
+		{
+			free(buffer);
+			return (NULL);
+		}
 		buffer[bytes_read] = '\0';
-		temp = excess;
-		excess = ft_strjoin(excess, buffer);
+		temp = *excess;
+		*excess = ft_strjoin(*excess, buffer);
 		free(temp);
 	}
 	free(buffer);
-	line = parse(&excess);
+	line = parse(excess);
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	char	*line;
+	char		*line;
+	static char	*excess = NULL;
 
-	if (fd == -1 || BUFFER_SIZE <= 0)
+	if (fd == -1 || fd > 1023 || BUFFER_SIZE <= 0)
 		return (NULL);
-	
-	line = read_file(fd);
+	if (!excess)
+	{
+		excess = malloc(sizeof(char));
+		excess[0] = '\0';
+	}
+	line = read_file(fd, &excess);
+	if (!line)
+	{
+		free(line);
+		return (NULL);
+	}
+	if (ft_strlen(line) == 0)
+	{
+		free(line);
+		return (NULL);
+	}
 	return (line);
 }
 
@@ -155,12 +136,12 @@ char	*get_next_line(int fd)
 	fd = open("./test_get_next_line.txt", O_RDONLY);
 	if (fd < 0)
 		return(0);
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		char *str = get_next_line(fd);
+		char *str = get_next_line(1000);
 		if (!str)
 		{
-			printf("error");
+			printf("file error or empty file");
 			return (0);
 		}	
 		printf("%s", str);
