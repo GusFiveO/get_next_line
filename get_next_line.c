@@ -6,7 +6,7 @@
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 19:26:11 by alorain           #+#    #+#             */
-/*   Updated: 2021/12/02 14:01:59 by alorain          ###   ########.fr       */
+/*   Updated: 2021/12/02 19:23:27 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,11 @@ char	*parse(char **excess)
 	temp = *excess;
 	*excess = ft_substr(*excess, line_len, excess_len - line_len);
 	free(temp);
+	if (ft_strlen(*excess) == 0)
+	{
+		free(*excess);
+		*excess = NULL;
+	}
 	return (line);
 }
 
