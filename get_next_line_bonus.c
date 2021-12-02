@@ -6,7 +6,7 @@
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 18:40:51 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/30 19:38:16 by alorain          ###   ########.fr       */
+/*   Updated: 2021/12/02 14:13:15 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,19 @@ char	*parse(char **excess)
 {
 	char	*line;
 	char	*temp;
-	size_t	line_len;
 	size_t	excess_len;
+	size_t	line_len;
 
 	excess_len = 0;
 	line_len = 0;
+	if (!*excess)
+		return (NULL);
+	excess_len = ft_strlen(*excess);
 	while ((*excess)[line_len] && (*excess)[line_len] != '\n')
 		line_len++;
 	if ((*excess)[line_len] == '\n')
 		line_len++;
 	line = ft_substr(*excess, 0, line_len);
-	excess_len = ft_strlen((*excess));
 	temp = *excess;
 	*excess = ft_substr(*excess, line_len, excess_len - line_len);
 	free(temp);
@@ -75,16 +77,15 @@ char	*parse(char **excess)
 
 char	*read_file(int fd, char **excess)
 {
-	ssize_t		bytes_read;
-	char		*buffer;
-	char		*line;
-	char		*temp;
+	char	*buffer;
+	char	*temp;
+	ssize_t	bytes_read;
 
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buffer)
 		return (NULL);
 	bytes_read = BUFFER_SIZE;
-	while (bytes_read && !ft_isin(*excess, '\n'))
+	while (bytes_read == BUFFER_SIZE && !ft_isin(*excess, '\n'))
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
@@ -98,35 +99,27 @@ char	*read_file(int fd, char **excess)
 		free(temp);
 	}
 	free(buffer);
-	line = parse(excess);
-	return (line);
+	return (*excess);
 }
 
 char	*get_next_line(int fd)
 {
+	static char	*excess[1024];
 	char		*line;
-	static char	*excess[_SC_OPEN_MAX];
-	char		*buffer;
+	char		buffer[1];
 
-	buffer = malloc(sizeof(char));
-	if (fd == -1 || BUFFER_SIZE <= 0 || read(fd, buffer, 0))
-	{	
-		free(buffer);
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, buffer, 0) == -1)
 		return (NULL);
-	}
-	free(buffer);
 	if (!excess[fd])
 	{
 		excess[fd] = malloc(sizeof(char));
+		if (!excess[fd])
+			return (NULL);
 		excess[fd][0] = '\0';
 	}
-	line = read_file(fd, &excess[fd]);
-	if (!line)
-	{
-		free(line);
-		return (NULL);
-	}
-	if (ft_strlen(line) == 0)
+	excess[fd] = read_file(fd, &excess[fd]);
+	line = parse(&excess[fd]);
+	if (!line || ft_strlen(line) == 0)
 	{
 		free(line);
 		return (NULL);

@@ -6,7 +6,7 @@
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/27 11:27:31 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/30 12:41:36 by alorain          ###   ########.fr       */
+/*   Updated: 2021/12/02 10:52:55 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,24 +34,6 @@ int	ft_isin(char *str, char c)
 		i++;
 	}
 	return (0);
-}
-
-char	*ft_strdup(char *str)
-{
-	char	*dup;
-	size_t	len;
-	size_t	i;
-
-	len = ft_strlen(str);
-	i = 0;
-	dup = malloc(sizeof(char) * (len + 1));
-	while (str[i])
-	{
-		dup[i] = str[i];
-		i++;
-	}
-	dup[i] = '\0';
-	return (dup);
 }
 
 char	*ft_strjoin(char *s1, char *s2)

@@ -6,7 +6,7 @@
 /*   By: alorain <alorain@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 14:30:02 by alorain           #+#    #+#             */
-/*   Updated: 2021/11/30 18:49:32 by alorain          ###   ########.fr       */
+/*   Updated: 2021/12/02 14:14:58 by alorain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,7 @@
 # define GET_NEXT_LINE_BONUS_H
 
 # include <unistd.h>
-# include <string.h>
 # include <stdlib.h>
-
 
 char	*get_next_line(int fd);
 
